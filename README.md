@@ -1,25 +1,65 @@
-#! /usr/bin/env bash
+# DALIAS
+
+```
 #    _       _  o         
 #  __)) ___  )) _  ___  __
 # ((_( ((_( (( (( ((_( _))
-# d y n a m i c  a l i a s
-#
-# Copyright (C) 2021, Stéphane MEYER.
-#
-# Dalias is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-# See the GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program. If not, see <https://www.gnu.org/licenses/>
-#
-# MODULE_NAME
-# C :
-# M :
-# D :
+```
+Dynamic aliases management.
+
+## Goal.
+
+I needed a quick way to create aliases on the go without having to source any script or .shellrc.  
+So I wrote **dalias** for this purpose. Simply put, it creates a script containing the  
+command to be aliased, makes it executable and add a symlink to "$HOME/.local/bin" so it is  
+immediately ready to use.
+
+## Dependencies.
+
+bash coreutils
+
+## Install.
+
+Clone this repository: `git clone https://gitlab.com/teegre/dalias.git`
+
+Then: `make install`
+
+## Uninstall.
+
+`make uninstall`
+
+## Usage
+
+```
+dalias
+dalias new <name> <command> [arguments]
+dalias del <name>
+dalias ls
+dalias help
+```
+
+## Options.
+
+Invoked without options, **dalias** prints the list of existing aliases.
+
+Other options are:
+
+*  new: create a new dynamic alias.
+*  del: delete an existing alias.
+*  ls: print alias list.
+*  help: show help and exit.
+
+## Examples
+
+To create a dynamic alias called *da* for **dalias**:
+
+`dalias new da dalias '"$@"'`
+
+The `'"$@"'` is mandatory since we want be able to pass options.
+
+Let's try it:
+
+```
+> da ls
+da    → dalias "$@"
+```
