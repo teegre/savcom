@@ -107,7 +107,7 @@ do dals dalias ls "$@"
 
 Note: since we are *not* on the *command line*, *single quotes are not needed*.
 
-Finally, entering the command: `da < aliases.txt` will create all the aliases automatically.
+Finally, entering the command: `dalias < aliases.txt` will create all the aliases automatically.
 
 If an error is encountered, **dalias** stops and indicates on which line the error occured.
 
