@@ -1,0 +1,135 @@
+#! /usr/bin/env bash
+#    _       _  o         
+#  __)) ___  )) _  ___  __
+# ((_( ((_( (( (( ((_( _))
+# d y n a m i c  a l i a s
+#
+# Copyright (C) 2021, Stéphane MEYER.
+#
+# Dalias is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <https://www.gnu.org/licenses/>
+#
+# MODULE_NAME
+# C : 2021/04/19
+# M : 2021/04/19
+# D : Dynamic aliases.
+
+declare __version="0.1"
+
+declare DA_CONFIG="$HOME/.config/dalias"
+declare BINDIR="$HOME/.local/bin"
+
+_help() {
+cat << HELP
+dalias - dynamic aliases management.
+dalias: version ${__version}.
+
+Commands:
+  dalias                                  - print aliases list.
+  dalias new <name> <command> [arguments] - create a new alias.
+  dalias del <name>                       - delete an alias.
+  dalias ls                               - print aliases list.
+  dalias help                             - show this help and exit.
+HELP
+}
+
+new() {
+  
+  local name cmd
+  name=$1; shift
+  cmd=("$@")
+
+
+  which "$name" &> /dev/null && {
+    >&2 echo "error: $name already exists."
+    return 1
+  }
+
+  which "${cmd[0]}" &> /dev/null || {
+    >&2 echo "error: command not found:  ${cmd[0]}."
+    return 1
+  }
+
+  local dst
+  dst="$DA_CONFIG/aliases/"
+
+  [[ -a ${dst}/${name}.da ]] && {
+    >&2 echo "error: an alias named $name already exists."
+    return 1
+  }
+
+  [[ -d $dst ]] ||
+    mkdir -p "$dst"
+
+  local da
+  da="$dst/${name}.da"
+
+  local script
+
+read -d "" -r script <<- DALIAS
+#! /usr/bin/env sh
+${cmd[@]}
+DALIAS
+
+  echo -e "$script" > "$da"
+  chmod +x "$da"
+
+  ln -s "$da" "${BINDIR}/${name}" &&
+    echo "${name}: alias created."
+}
+
+del() {
+  [[ $1 ]] && {
+    local name dst link
+    name="$1"
+    dst="${DA_CONFIG}/aliases/${name}.da"
+    link="${BINDIR}/${name}"
+
+    [[ -a $dst ]] || {
+      >&2 echo "error: ${name}: no such alias."
+      return 1
+    }
+
+    rm "$dst" "$link" 2> /dev/null || {
+      >&2 echo "error: ${name}: could not delete alias"
+      return 1
+    }
+    echo "${name}: alias deleted."
+  }
+}
+
+lst() {
+  local name cmd
+  for f in "${DA_CONFIG}"/aliases/*.da; do
+    name="$(basename "${f%*.da}")"
+    while read -r; do
+      [[ $REPLY =~ ^#.+$ ]] && continue
+      cmd="$REPLY"
+    done < "$f"
+    printf "%-5s → %s\n" "$name" "$cmd"
+  done
+}
+
+case $1 in
+  new ) shift; new "$@" ;;
+  del ) shift; del "$@" ;;
+  ls  ) lst ;;
+  help) _help ;;
+  *   ) 
+        if ! [[ $1 ]]; then
+          lst
+        else
+          >&2 echo "error: invalid command: $1"
+          exit 1
+        fi
+esac
