@@ -2,7 +2,6 @@
 #    _       _  o         
 #  __)) ___  )) _  ___  __
 # ((_( ((_( (( (( ((_( _))
-# d y n a m i c  a l i a s
 #
 # Copyright (C) 2021, Stéphane MEYER.
 #
@@ -19,60 +18,77 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <https://www.gnu.org/licenses/>
 #
-# MODULE_NAME
+# DALIAS
 # C : 2021/04/19
 # M : 2021/04/19
 # D : Dynamic aliases.
 
 declare __version="0.1"
 
-declare DA_CONFIG="$HOME/.config/dalias"
+declare ALIASDIR="$HOME/.config/dalias/aliases"
 declare BINDIR="$HOME/.local/bin"
 
 _help() {
 cat << HELP
-dalias - dynamic aliases management.
 dalias: version ${__version}.
+Dynamic aliases.
 
 Commands:
-  dalias                                  - print aliases list.
-  dalias new <name> <command> [arguments] - create a new alias.
-  dalias del <name>                       - delete an alias.
-  dalias ls                               - print aliases list.
-  dalias help                             - show this help and exit.
+  dalias                                 - reads from standard input.
+  dalias do <name> <command> <arguments> - create/modify.
+  dalias mv <name> <newname>             - rename.
+  dalias rm <name>                       - delete.
+  dalias dp <file>                       - dump existing aliases in a file.
+  dalias ls [name|glob]                  - print aliases list.
+  dalias help                            - show this help and exit.
+
 HELP
 }
 
-new() {
+confirm() {
+  # ask user for confirmation.
+
+  local prompt
+  prompt="${1:-"sure?"}"
+
+  printf "%s [y/N]: " "$prompt"
+  read -r r
+  [[ ${r,,} == "y" ]] && return 0
+  return 1
+}
+
+do_alias() {
+  # create/modify a new dynamic alias
   
   local name cmd
   name=$1; shift
   cmd=("$@")
 
-
-  which "$name" &> /dev/null && {
-    >&2 echo "error: $name already exists."
-    return 1
+  # does alias already exists?
+  local _alias
+  _alias="$(which "$name" 2> /dev/null)" && {
+    if [[ $(readlink -f "$_alias") =~ \.da$ ]]; then
+      >&2 echo "warning: a dynamic alias named '${name}' already exists."
+      [[ $NOCONFIRM ]] && return 1
+      confirm "overwrite?" || return 1
+      local FORCE=1
+    else
+      >&2 echo "error: $name already exists."
+      return 1
+    fi
   }
 
+  # does command exists?
   which "${cmd[0]}" &> /dev/null || {
     >&2 echo "error: command not found:  ${cmd[0]}."
     return 1
   }
 
-  local dst
-  dst="$DA_CONFIG/aliases/"
-
-  [[ -a ${dst}/${name}.da ]] && {
-    >&2 echo "error: an alias named $name already exists."
-    return 1
-  }
-
-  [[ -d $dst ]] ||
-    mkdir -p "$dst"
+  [[ -d $ALIASDIR ]] ||
+    mkdir -p "$ALIASDIR"
 
   local da
-  da="$dst/${name}.da"
+  da="$ALIASDIR/${name}.da"
 
   local script
 
@@ -82,17 +98,56 @@ ${cmd[@]}
 DALIAS
 
   echo -e "$script" > "$da"
-  chmod +x "$da"
+  chmod 700 "$da"
 
+  [[ $FORCE ]] && rm "${BINDIR}/${name}"
   ln -s "$da" "${BINDIR}/${name}" &&
-    echo "${name}: alias created."
+    echo "${name}: dynamic alias created."
 }
 
-del() {
+mv_alias() {
+  local from to
+  from="$1"
+  to="$2"
+
+  [[ $from ]] || [[ $to ]] || {
+    >&2 echo "error: missing parameters."
+    return 1
+  }
+
+  which "$to" &> /dev/null && {
+    >&2 echo "error: ${to} is an existing command/alias."
+    return 1
+  }
+
+  local alias_src link_src
+  alias_src="${ALIASDIR}/${from}.da"
+  link_src="${BINDIR}/${from}"
+
+  if [[ -a $alias_src ]] && [[ -L $link_src ]]; then
+    local alias_dst link_dst
+    alias_dst="${ALIASDIR}/${to}.da"
+    link_dst="${BINDIR}/${to}"
+
+    mv "$alias_src" "$alias_dst" 2> /dev/null || {
+      >&2 echo "${from} -> ${to}: error: could not rename."
+      return 1
+    }
+
+    rm "$link_src"
+    ln -s "$alias_dst" "$link_dst" &&
+      echo "${from} -> ${to}: dynamic alias renamed."
+  else
+    >&2 echo "error: no such dynamic alias: ${from}."
+    return 1
+  fi
+}
+
+rm_alias() {
   [[ $1 ]] && {
     local name dst link
     name="$1"
-    dst="${DA_CONFIG}/aliases/${name}.da"
+    dst="${ALIASDIR}/${name}.da"
     link="${BINDIR}/${name}"
 
     [[ -a $dst ]] || {
@@ -100,36 +155,89 @@ del() {
       return 1
     }
 
-    rm "$dst" "$link" 2> /dev/null || {
-      >&2 echo "error: ${name}: could not delete alias"
+    rm "$link" "$dst" 2> /dev/null || {
+      >&2 echo "error: ${name}: could not delete dynamic alias"
       return 1
     }
-    echo "${name}: alias deleted."
+    echo "${name}: dynamic alias deleted."
   }
 }
 
-lst() {
-  local name cmd
-  for f in "${DA_CONFIG}"/aliases/*.da; do
+ls_alias() {
+  local _alias name cmd
+
+  [[ $1 == "-d" ]] && { shift; local DUMP=1; }
+  
+  [[ $1 ]] && _alias="$1" || _alias="*"
+
+  compgen -G "${ALIASDIR}/${_alias}.da" &> /dev/null || {
+    >&2 echo "no result."
+    return 1
+  }
+  
+  for f in "${ALIASDIR}"/${_alias}.da; do
     name="$(basename "${f%*.da}")"
     while read -r; do
       [[ $REPLY =~ ^#.+$ ]] && continue
       cmd="$REPLY"
     done < "$f"
-    printf "%-5s → %s\n" "$name" "$cmd"
+    if [[ $DUMP ]]; then
+      printf "do %s %s\n" "$name" "$cmd"
+    else
+      printf "%s=%s\n" "$name" "$cmd"
+    fi
   done
 }
 
-case $1 in
-  new ) shift; new "$@" ;;
-  del ) shift; del "$@" ;;
-  ls  ) lst ;;
-  help) _help ;;
-  *   ) 
-        if ! [[ $1 ]]; then
-          lst
-        else
-          >&2 echo "error: invalid command: $1"
-          exit 1
-        fi
-esac
+
+dp_alias() {
+  # dump existing dynamic aliases into a file.
+
+  [[ $1 ]] || {
+    >&2 echo "error: filename missing."
+    return 1
+  }
+
+  [[ -a "$1" ]] && {
+    >&2 echo "warning: $1 already exists,"
+    confirm "overwrite?" || return 1
+  }
+
+  ls_alias -d > "$1"
+
+  echo "done."
+}
+
+if (( $# > 0 )); then
+  case $1 in
+    do  ) shift; do_alias "$@" ;;
+    mv  ) shift; mv_alias "$@" ;;
+    rm  ) shift; rm_alias "$@" ;;
+    dp  ) shift; dp_alias "$@" ;;
+    ls  ) shift; ls_alias "$@" ;;
+    help) _help ;;
+    ""  ) ls_alias ;;
+    *   ) >&2 echo "error: invalid command: $1"; exit 1
+  esac
+else
+  NOCONFIRM=1
+  LINE=0
+  while IFS= read -r; do
+    ((++LINE))
+
+    # ignore comments, ls, dp and help commands...
+    [[ $REPLY =~ ^#.*$ ]] && continue
+    [[ $REPLY =~ ^dp.*$ ]] && continue
+    [[ $REPLY =~ ^ls.*$ ]] && continue
+    [[ $REPLY =~ ^help.*$ ]] && continue
+
+    mapfile -t arglist <<< "${REPLY// /$'\n'}"
+    set -- "${arglist[@]}"
+    echo -n "${1}: "
+    case $1 in
+      do) shift; do_alias "$@" || { >&2 echo "error: on line ${LINE}."; exit 1; } ;;
+      rm) shift; rm_alias "$@" || { >&2 echo "error: on line ${LINE}."; exit 1; } ;;
+      * ) >&2 echo "error: invalid command: ${1}."; exit 1
+    esac
+  done
+fi
