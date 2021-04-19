@@ -64,7 +64,13 @@ do_alias() {
   name=$1; shift
   cmd=("$@")
 
-  # does alias already exists?
+  # does command exist?
+  which "${cmd[0]}" &> /dev/null || {
+    >&2 echo "error: command not found:  ${cmd[0]}."
+    return 1
+  }
+
+  # does alias already exist?
   local _alias
   _alias="$(which "$name" 2> /dev/null)" && {
     if [[ $(readlink -f "$_alias") =~ \.da$ ]]; then
@@ -76,12 +82,6 @@ do_alias() {
       >&2 echo "error: $name already exists."
       return 1
     fi
-  }
-
-  # does command exists?
-  which "${cmd[0]}" &> /dev/null || {
-    >&2 echo "error: command not found:  ${cmd[0]}."
-    return 1
   }
 
   [[ -d $ALIASDIR ]] ||
