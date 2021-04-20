@@ -20,10 +20,10 @@
 #
 # DALIAS
 # C : 2021/04/19
-# M : 2021/04/19
+# M : 2021/04/20
 # D : Dynamic aliases.
 
-declare __version="0.1"
+declare __version="0.1.1"
 
 declare ALIASDIR="$HOME/.config/dalias/aliases"
 declare BINDIR="$HOME/.local/bin"
@@ -36,6 +36,7 @@ Dynamic aliases.
 Commands:
   dalias                                 - reads from standard input.
   dalias do <name> <command> <arguments> - create/modify.
+  dalias ed <name>                       - edit.
   dalias mv <name> <newname>             - rename.
   dalias rm <name>                       - delete.
   dalias dp <file>                       - dump existing aliases in a file.
@@ -45,6 +46,23 @@ Commands:
 HELP
 }
 
+_msg() {
+  # error/message display.
+  local _type msg
+
+  case $1 in
+    E) _type="error: "; msg="$2" ;;   # error
+    M) msg="$2" ;;                # message
+    W) _type="warning: "; msg="$2" ;; # warning
+  esac
+
+  if [[ $1 == "E" || $1 == "W" ]]; then
+    >&2 echo "${_type}${msg}"
+  else
+    echo "$msg"
+  fi
+}
+
 confirm() {
   # ask user for confirmation.
 
@@ -52,8 +70,8 @@ confirm() {
   prompt="${1:-"sure?"}"
 
   printf "%s [y/N]: " "$prompt"
-  read -r r
-  [[ ${r,,} == "y" ]] && return 0
+  read -r
+  [[ ${REPLY,,} == "y" ]] && return 0
   return 1
 }
 
@@ -65,21 +83,24 @@ do_alias() {
   cmd=("$@")
 
   # does command exist?
-  which "${cmd[0]}" &> /dev/null || {
-    >&2 echo "error: command not found:  ${cmd[0]}."
-    return 1
+  type "${cmd[0]}" &> /dev/null || {
+    # exception for environment variables...
+    [[ ${cmd[0]} =~ ^\"?\$ ]] || {
+      _msg E "command not found:  ${cmd[0]}."
+      return 1
+    }
   }
 
   # does alias already exist?
   local _alias
   _alias="$(which "$name" 2> /dev/null)" && {
     if [[ $(readlink -f "$_alias") =~ \.da$ ]]; then
-      >&2 echo "warning: a dynamic alias named '${name}' already exists."
-      [[ $NOCONFIRM ]] && return 1
+      _msg W "a dynamic alias named '${name}' already exists."
+      [[ $NOCONFIRM ]] && return 0
       confirm "overwrite?" || return 1
       local FORCE=1
     else
-      >&2 echo "error: $name already exists."
+      _msg E "$name already exists."
       return 1
     fi
   }
@@ -102,7 +123,32 @@ DALIAS
 
   [[ $FORCE ]] && rm "${BINDIR}/${name}"
   ln -s "$da" "${BINDIR}/${name}" &&
-    echo "${name}: dynamic alias created."
+    _msg M "${name}: dynamic alias created."
+}
+
+ed_alias() {
+  local name
+  name="$1"
+
+  [[ $name ]] || {
+    _msg E "dynamic alias name missing."
+    return 1
+  }
+
+  local da
+  da="${ALIASDIR}/${name}.da"
+
+  if [[ -a $da ]]; then
+    [[ $EDITOR ]] || {
+      _msg E "EDITOR environment variable not set."
+      return 1
+    }
+
+    "${EDITOR}" "$da"
+  else
+    _msg E "${name}: no such dynamic alias."
+    return 1
+  fi
 }
 
 mv_alias() {
@@ -111,12 +157,12 @@ mv_alias() {
   to="$2"
 
   [[ $from ]] || [[ $to ]] || {
-    >&2 echo "error: missing parameters."
+    _msg E "missing parameters."
     return 1
   }
 
   which "$to" &> /dev/null && {
-    >&2 echo "error: ${to} is an existing command/alias."
+    _msg E "${to} is an existing command/alias."
     return 1
   }
 
@@ -130,15 +176,15 @@ mv_alias() {
     link_dst="${BINDIR}/${to}"
 
     mv "$alias_src" "$alias_dst" 2> /dev/null || {
-      >&2 echo "${from} -> ${to}: error: could not rename."
+      _msg E "${from} -> ${to}: could not rename."
       return 1
     }
 
     rm "$link_src"
     ln -s "$alias_dst" "$link_dst" &&
-      echo "${from} -> ${to}: dynamic alias renamed."
+      _msg M "${from} -> ${to}: dynamic alias renamed."
   else
-    >&2 echo "error: no such dynamic alias: ${from}."
+    _msg E "no such dynamic alias: ${from}."
     return 1
   fi
 }
@@ -151,15 +197,15 @@ rm_alias() {
     link="${BINDIR}/${name}"
 
     [[ -a $dst ]] || {
-      >&2 echo "error: ${name}: no such alias."
+      _msg E "${name}: no such alias."
       return 1
     }
 
     rm "$link" "$dst" 2> /dev/null || {
-      >&2 echo "error: ${name}: could not delete dynamic alias"
+      _msg E "${name}: could not delete dynamic alias"
       return 1
     }
-    echo "${name}: dynamic alias deleted."
+    _msg M "${name}: dynamic alias deleted."
   }
 }
 
@@ -194,30 +240,31 @@ dp_alias() {
   # dump existing dynamic aliases into a file.
 
   [[ $1 ]] || {
-    >&2 echo "error: filename missing."
+    _msg E "filename missing."
     return 1
   }
 
   [[ -a "$1" ]] && {
-    >&2 echo "warning: $1 already exists,"
+    _msg E "$1 already exists,"
     confirm "overwrite?" || return 1
   }
 
   ls_alias -d > "$1"
 
-  echo "done."
+  _msg M "done."
 }
 
 if (( $# > 0 )); then
   case $1 in
-    do  ) shift; do_alias "$@" ;;
-    mv  ) shift; mv_alias "$@" ;;
-    rm  ) shift; rm_alias "$@" ;;
-    dp  ) shift; dp_alias "$@" ;;
-    ls  ) shift; ls_alias "$@" ;;
-    help) _help ;;
-    ""  ) ls_alias ;;
-    *   ) >&2 echo "error: invalid command: $1"; exit 1
+    do     ) shift; do_alias "$@" ;;
+    ed     ) shift; ed_alias "$@" ;;
+    mv     ) shift; mv_alias "$@" ;;
+    rm     ) shift; rm_alias "$@" ;;
+    dp     ) shift; dp_alias "$@" ;;
+    ls     ) shift; ls_alias "$@" ;;
+    help   ) _help ;;
+    version) _msg M "dalias version ${__version}." ;;
+    *      ) _msg E "invalid command: $1"; exit 1
   esac
 else
   NOCONFIRM=1
@@ -225,9 +272,10 @@ else
   while IFS= read -r; do
     ((++LINE))
 
-    # ignore comments, ls, dp and help commands...
+    # ignore comments, dp, ed, ls and help commands...
     [[ $REPLY =~ ^#.*$ ]] && continue
     [[ $REPLY =~ ^dp.*$ ]] && continue
+    [[ $REPLY =~ ^ed.*$ ]] && continue
     [[ $REPLY =~ ^ls.*$ ]] && continue
     [[ $REPLY =~ ^help.*$ ]] && continue
 
@@ -235,9 +283,9 @@ else
     set -- "${arglist[@]}"
     echo -n "${1}: "
     case $1 in
-      do) shift; do_alias "$@" || { >&2 echo "error: on line ${LINE}."; exit 1; } ;;
-      rm) shift; rm_alias "$@" || { >&2 echo "error: on line ${LINE}."; exit 1; } ;;
-      * ) >&2 echo "error: invalid command: ${1}."; exit 1
+      do) shift; do_alias "$@" || { _msg E "on line ${LINE}."; } ;;
+      rm) shift; rm_alias "$@" || { _msg E "on line ${LINE}."; } ;;
+      * ) _msg E "invalid command: ${1}."; exit 1
     esac
   done
 fi
