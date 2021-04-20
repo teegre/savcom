@@ -83,6 +83,11 @@ do_alias() {
   name=$1; shift
   cmd=("$@")
 
+  [[ ! $name || ! ${cmd[*]} ]] && {
+    _msg E "missing parameters."
+    return 1
+  }
+
   # does command exist?
   type "${cmd[0]}" &> /dev/null || {
     # exception for environment variables...
@@ -157,7 +162,7 @@ mv_alias() {
   from="$1"
   to="$2"
 
-  [[ $from ]] || [[ $to ]] || {
+  [[ ! $from || ! $to ]] && {
     _msg E "missing parameters."
     return 1
   }
@@ -207,7 +212,9 @@ rm_alias() {
       return 1
     }
     _msg M "${name}: dynamic alias deleted."
+    return 0
   }
+  _msg E "dynamic alias name missing."
 }
 
 ls_alias() {
