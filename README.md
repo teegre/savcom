@@ -44,6 +44,7 @@ dalias rm <name>
 dalias dp <file>
 dalias ls [name|glob]
 dalias help
+dalias version
 ```
 
 ## Options.
@@ -59,6 +60,7 @@ Available options are:
 *  dp: dump existing aliases into a file.
 *  ls: print dynamic alias list.
 *  help: show help and exit.
+*  version: show program version and exit.
 
 ## Examples
 

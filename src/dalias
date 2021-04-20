@@ -42,6 +42,7 @@ Commands:
   dalias dp <file>                       - dump existing aliases in a file.
   dalias ls [name|glob]                  - print aliases list.
   dalias help                            - show this help and exit.
+  dalias version                         - show program version and exit.
 
 HELP
 }
@@ -52,7 +53,7 @@ _msg() {
 
   case $1 in
     E) _type="error: "; msg="$2" ;;   # error
-    M) msg="$2" ;;                # message
+    M) msg="$2" ;;                    # message
     W) _type="warning: "; msg="$2" ;; # warning
   esac
 
