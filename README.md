@@ -11,7 +11,7 @@ Dynamic aliases.
 
 I needed a quick way to create aliases on the go without having to source any script.  
 So I wrote **dalias** for this purpose. Simply put, it creates a script containing the "aliased"  
-command with its parameters (stored in `$HOME/.config/dalias/aliases`), makes it executable and
+command with its parameters (stored in `$HOME/.config/dalias/aliases`), makes it executable and  
 adds a symlink to "$HOME/.local/bin" so it is immediately ready to use.
 
 ## Dependencies.
