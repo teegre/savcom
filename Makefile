@@ -2,6 +2,7 @@ PROGNAME  ?= dalias
 PREFIX    ?= /usr
 BINDIR    ?= $(PREFIX)/bin
 SHAREDIR  ?= $(PREFIX)/share
+MANDIR    ?= $(SHAREDIR)/man/man1
 
 MANPAGE    = $(PROGNAME).1
 
@@ -11,6 +12,7 @@ install: src/$(PROGNAME).out
 
 	install -m755  src/$(PROGNAME).out $(DESTDIR)$(BINDIR)/$(PROGNAME)
 	
+	install -Dm644 $(MANPAGE) -t $(DESTDIR)$(MANDIR)
 	install -Dm644 LICENSE    -t $(DESTDIR)$(SHAREDIR)/licenses/$(PROGNAME)
 
 	rm src/$(PROGNAME).out
