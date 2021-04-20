@@ -253,7 +253,7 @@ dp_alias() {
   }
 
   [[ -a "$1" ]] && {
-    _msg E "$1 already exists,"
+    _msg W "$1 already exists,"
     confirm "overwrite?" || return 1
   }
 
