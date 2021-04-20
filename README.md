@@ -12,7 +12,7 @@ Dynamic aliases.
 I needed a quick way to create aliases on the go without having to source any script.  
 So I wrote **dalias** for this purpose. Simply put, it creates a script containing the "aliased"  
 command with its parameters (stored in `$HOME/.config/dalias/aliases`), makes it executable and  
-adds a symlink to "$HOME/.local/bin" so it is immediately ready to use.
+adds a symlink to it in "$HOME/.local/bin" so it is immediately ready to use.
 
 ## Dependencies.
 
@@ -26,8 +26,9 @@ Then:
 
 `make install`
 
-Make sure you have a directory called `.local/bin` in your home directory,  
-and that it is included in your `$PATH`.
+**Important**: Make sure you have a directory called `.local/bin` in your home  
+directory, and that it is included in your `$PATH`. Also make sure `$EDITOR`  
+environment variable is set to your favorite text editor.
 
 ## Uninstall.
 
@@ -37,6 +38,7 @@ and that it is included in your `$PATH`.
 
 ```
 dalias do <name> <command> [arguments]
+dalias ed <name>
 dalias mv <name> <newname>
 dalias rm <name>
 dalias dp <file>
@@ -51,6 +53,7 @@ Invoked without options, **dalias** reads from standard input.
 Available options are:
 
 *  do: create/update.
+*  ed: edit.
 *  mv: rename.
 *  rm: delete.
 *  dp: dump existing aliases into a file.
@@ -108,16 +111,14 @@ do dadp dalias dp "$@"
 do dals dalias ls "$@"
 ```
 
-Note: since we are *not* on the *command line*, *single quotes are not needed*.
+Note: since we are **not** on the **command line**, **single quotes** are **not needed**.
 
 Finally, entering the command: `dalias < aliases.txt` will create all the aliases automatically.
 
-If an error is encountered, **dalias** stops and indicates on which line the error occured.
+If an error is encountered, **dalias** skips and indicates on which line the error occured.
 
 ## Save dynamic aliases into a file.
 
 You may want to save your aliases, for instance, to use them on another computer.
 
 To do so: `dalias dp <file>`
-
-
