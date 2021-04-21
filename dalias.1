@@ -18,17 +18,15 @@
 .br
 \fBdalias\fR version
 .SH "DESCRIPTION"
-.P
 \fBdalias\fR provides a quick way to create aliases on the go without having to source any script\.
 .SH "OPTIONS"
-.P
 Invoked without options, \fBdalias\fR reads from standard input\.
 .P
 Available options are:
 .P
     - do: create or update\.
 .br
-    - ed: edit\.
+    - ed: edit(1)\.
 .br
     - mv: rename\.
 .br
@@ -42,6 +40,7 @@ Available options are:
 .br
     - version: show program version and exit\.
 .P
+(1) Make sure \fB$EDITOR\fR environment variable is set.
 .SH "EXAMPLES"
 .P
 To create a dynamic alias called "da" for \fBdalias\fR:
@@ -96,6 +95,10 @@ To do so:
 \fBdalias\fR dp <\fIfile\fR>
 .fi
 .IP "" 0
+.SH "DIRECTORIES"
+Dynamic aliases are stored in \fB$HOME/\.config/dalias/aliases\fR directories\. And they are symlinked to
+.br
+\fB$HOME/\.local/bin\fR\.
 .SH "AUTHOR"
 Written by Stéphane MEYER (Teegre)
 .SH "REPORTING BUGS"
