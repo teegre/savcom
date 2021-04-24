@@ -41,42 +41,6 @@ Available options are:
     - version: show program version and exit\.
 .P
 (1) Make sure \fB$EDITOR\fR environment variable is set.
-.SH "EXAMPLES"
-.P
-To create a dynamic alias called "da" for \fBdalias\fR:
-.IP "" 4
-.nf
-\fBdalias\fR do da dalias \'"$@"\'
-.fi
-.IP "" 0
-.br
-Unlike regular aliases, \fB\'"$@"\'\fR is mandatory since we want be able to pass options to \fBdalias\fR\.
-.br
-Also notice the surrounding single quotes. They are needed to prevent the shell from interpreting \fB"$@"\fR\.
-.P
-Another example for \fBls\fR command:
-.IP "" 4
-.nf
-\fBdalias\fR do ll ls \-ahl \-\-group\-directories\-first \-\-color=auto \'"$@"\'
-.fi
-.IP "" 0
-.P
-If an alias is made of several commands, semicolons have to be escaped such as in:
-.IP "" 4
-.nf
-\fBdalias\fR do jj clear\\; journalctl -f
-.fi
-.IP "" 0
-.P
-A more advanced last example:
-.IP "" 4
-.nf
-\fBdalias\fR do dprm while read -r\\; do echo '"rm $REPLY"' \\| cut -d '=' -f 1\\; done \\< \\<\\(dalias ls\\) \\> rm_aliases
-.fi
-.IP "" 0
-.P
-This prints a \fIrm\fR command for every dynamic alias and saves them in a file called "rm_aliases"\.
-.P
 .SH "BATCH ALIASING"
 .P
 Since \fBdalias\fR reads from stdin, it is possible to create a bunch of aliases from a file\.
@@ -118,6 +82,42 @@ To do so:
 Dynamic aliases are stored in \fB$HOME/\.config/dalias/aliases\fR directories\. And they are symlinked to
 .br
 \fB$HOME/\.local/bin\fR\.
+.SH "EXAMPLES"
+.P
+To create a dynamic alias called "da" for \fBdalias\fR:
+.IP "" 4
+.nf
+\fBdalias\fR do da dalias \'"$@"\'
+.fi
+.IP "" 0
+.br
+Unlike regular aliases, \fB\'"$@"\'\fR is mandatory since we want be able to pass options to \fBdalias\fR\.
+.br
+Also notice the surrounding single quotes. They are needed to prevent the shell from interpreting \fB"$@"\fR\.
+.P
+Another example for \fBls\fR command:
+.IP "" 4
+.nf
+\fBdalias\fR do ll ls \-ahl \-\-group\-directories\-first \-\-color=auto \'"$@"\'
+.fi
+.IP "" 0
+.P
+If an alias is made of several commands, semicolons have to be escaped such as in:
+.IP "" 4
+.nf
+\fBdalias\fR do jj clear\\; journalctl -f
+.fi
+.IP "" 0
+.P
+A more advanced last example:
+.IP "" 4
+.nf
+\fBdalias\fR do dprm while read -r\\; do echo '"rm $REPLY"' \\| cut -d '=' -f 1\\; done \\< \\<\\(dalias ls\\) \\> rm_aliases
+.fi
+.IP "" 0
+.P
+This prints a \fIrm\fR command for every dynamic alias and saves them in a file called "rm_aliases"\.
+.P
 .SH "AUTHOR"
 Written by Stéphane MEYER (Teegre)
 .SH "REPORTING BUGS"
