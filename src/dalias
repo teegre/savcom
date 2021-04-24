@@ -20,10 +20,10 @@
 #
 # DALIAS
 # C : 2021/04/19
-# M : 2021/04/20
+# M : 2021/04/24
 # D : Dynamic aliases.
 
-declare __version="0.1.1"
+declare __version="0.1.2"
 
 declare ALIASDIR="$HOME/.config/dalias/aliases"
 declare BINDIR="$HOME/.local/bin"
@@ -89,10 +89,11 @@ do_alias() {
   }
 
   # does command exist?
-  type "${cmd[0]}" &> /dev/null || {
+
+  type "${cmd[0]/\;}" &> /dev/null || {
     # exception for environment variables...
     [[ ${cmd[0]} =~ ^\"?\$ ]] || {
-      _msg E "command not found:  ${cmd[0]}."
+      _msg E "command not found:  ${cmd[0]/\;}."
       return 1
     }
   }
