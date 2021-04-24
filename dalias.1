@@ -1,4 +1,4 @@
-.TH "DALIAS" "1" "0.1.1" "April 2021" "General Commands"
+.TH "DALIAS" "1" "0.1.2" "April 2021" "General Commands"
 .SH "NAME"
 \fBdalias\fR \- Dynamic aliases
 .SH "SYNOPSIS"
@@ -34,7 +34,7 @@ Available options are:
 .br
     - dp: dump existing aliases into a file\.
 .br
-    - ls: print dynamic alias list\.
+    - ls: print/search dynamic alias list\.
 .br
     - help: show help and exit\.
 .br
@@ -51,13 +51,23 @@ To create a dynamic alias called "da" for \fBdalias\fR:
 .IP "" 0
 .br
 Unlike regular aliases, \fB\'"$@"\'\fR is mandatory since we want be able to pass options to \fBdalias\fR\.
+.br
+Also notice the surrounding single quotes. They are needed to prevent the shell from interpreting \fB"$@"\fR\.
 .P
-Another example for the \fBls\fR command:
+Another example for \fBls\fR command:
 .IP "" 4
 .nf
 \fBdalias\fR do ll ls \-ahl \-\-group\-directories\-first \-\-color=auto \'"$@"\'
 .fi
 .IP "" 0
+.P
+If an alias is made of several commands, semicolons have to be escaped such as in:
+.IP "" 4
+.nf
+\fBdalias\fR do jj clear\\; journalctl -f
+.fi
+.IP "" 0
+.P
 .SH "BATCH ALIASING"
 .P
 Since \fBdalias\fR reads from stdin, it is possible to create a bunch of aliases from a file\.
