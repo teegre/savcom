@@ -68,6 +68,15 @@ If an alias is made of several commands, semicolons have to be escaped such as i
 .fi
 .IP "" 0
 .P
+A more advanced last example:
+.IP "" 4
+.nf
+\fBdalias\fR do dprm while read -r\\; do echo '"rm $REPLY"' \\| cut -d '=' -f 1\\; done \\< \\<\\(dalias ls\\) \\> rm_aliases
+.fi
+.IP "" 0
+.P
+This prints a \fIrm\fR command for every dynamic alias and saves them in a file called "rm_aliases"\.
+.P
 .SH "BATCH ALIASING"
 .P
 Since \fBdalias\fR reads from stdin, it is possible to create a bunch of aliases from a file\.
@@ -88,7 +97,7 @@ cat file | \fBdalias\fR
 .fi
 .IP "" 0
 .P
-Each line of the file must contain \fBdalias\fR commands:
+Each line of the file must contain \fBdalias\fR \fIdo\fR or \fIrm\fR commands:
 .P
 <\fIdalias_command\fR> <\fIalias_name\fR> [<\fIcommand\fR> [\fIarguments\fR]]
 .P
