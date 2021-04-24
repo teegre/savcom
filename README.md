@@ -58,11 +58,11 @@ Available options are:
 *  mv: rename.
 *  rm: delete.
 *  dp: dump existing aliases into a file.
-*  ls: print dynamic alias list.
+*  ls: print/search dynamic alias list.
 *  help: show help and exit.
 *  version: show program version and exit.
 
-## Examples
+## Example
 
 To create a dynamic alias called *da* for **dalias**:
 
@@ -71,56 +71,7 @@ To create a dynamic alias called *da* for **dalias**:
 da: dynamic alias created.
 ```
 
-The `'"$@"'` is mandatory since we want be able to pass options.
+The `'"$@"'` is mandatory since we want be able to pass options to **dalias**.  
+Also notice the surrounding single quotes. They are needed to prevent the shell from interpreting "$@".
 
-Let's try it:
-
-```
-> da ls
-da=dalias "$@"
-```
-Now let's create aliases for every dalias command:
-```
-> da do dado dalias do '"$@"'
-dado: dynamic alias created.
-> da do damv dalias mv '"$@"'
-damv: dynamic alias created.
-> da do darm dalias rm '"$@"'
-darm: dynamic alias created.
-> da do dals dalias ls '"$@"'
-dals: dynamic alias created.
-```
-
-## Batch aliasing.
-
-Since **dalias** reads from stdin, it is possible to create a bunch of aliases from a file.  
-The syntax is as follow:
-
-`dalias < file` or `cat file | dalias`
-
-Each line of the file must contain **dalias** commands formatted like this:
-
-`<dalias command> <name> [<command> [arguments]]`
-
-Let's take our last example:
-
-```
-# aliases.txt
-do dado dalias do "$@"
-do damv dalias mv "$@"
-do darm dalias rm "$@"
-do dadp dalias dp "$@"
-do dals dalias ls "$@"
-```
-
-Note: since we are **not** on the **command line**, **single quotes** are **not needed**.
-
-Finally, entering the command: `dalias < aliases.txt` will create all the aliases automatically.
-
-If an error is encountered, **dalias** skips and indicates on which line the error occured.
-
-## Save dynamic aliases into a file.
-
-You may want to save your aliases, for instance, to use them on another computer.
-
-To do so: `dalias dp <file>`
+For more info, please read `man dalias`.
