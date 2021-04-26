@@ -53,7 +53,7 @@ Invoked without options, **dalias** reads from standard input.
 
 Available options are:
 
-*  do: create/update.
+*  do: create/replace.
 *  ed: edit.
 *  mv: rename.
 *  rm: delete.
@@ -71,7 +71,7 @@ To create a dynamic alias called *da* for **dalias**:
 da: dynamic alias created.
 ```
 
-The `'"$@"'` is mandatory since we want be able to pass options to **dalias**.  
+The `'"$@"'` is mandatory here, since we want be able to pass options to **dalias**.  
 Also notice the surrounding single quotes. They are needed to prevent the shell from interpreting "$@".
 
 For more info, please read `man dalias`.
