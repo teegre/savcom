@@ -117,6 +117,13 @@ A more advanced last example:
 .IP "" 0
 .P
 This prints a \fIrm\fR command for every dynamic alias and saves them in a file called "rm_aliases"\.
+.br
+This syntax is also valid:
+.IP "" 4
+.nf
+\fBdalias\fR do dprm while 'read -r; do echo "rm $REPLY" | cut -d "=" -f 1; done < <(dalias ls) > rm_aliases'
+.fi
+.IP "" 0
 .P
 .SH "AUTHOR"
 Written by Stéphane MEYER (Teegre)
