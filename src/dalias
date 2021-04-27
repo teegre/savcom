@@ -20,7 +20,7 @@
 #
 # DALIAS
 # C : 2021/04/19
-# M : 2021/04/24
+# M : 2021/04/27
 # D : Dynamic aliases.
 
 declare __version="0.1.2"
@@ -35,7 +35,7 @@ Dynamic aliases.
 
 Commands:
   dalias                                 - reads from standard input.
-  dalias do <name> <command> <arguments> - create/modify.
+  dalias do <name> <command> [arguments] - create/replace.
   dalias ed <name>                       - edit.
   dalias mv <name> <newname>             - rename.
   dalias rm <name>                       - delete.
@@ -244,7 +244,6 @@ ls_alias() {
   done
 }
 
-
 dp_alias() {
   # dump existing dynamic aliases into a file.
 
@@ -294,7 +293,7 @@ else
     case $1 in
       do) shift; do_alias "$@" || { _msg E "on line ${LINE}."; } ;;
       rm) shift; rm_alias "$@" || { _msg E "on line ${LINE}."; } ;;
-      * ) _msg E "invalid command: ${1}."; exit 1
+      * ) _msg E "invalid command: ${1} (line ${LINE})."; exit 1
     esac
   done
 fi
