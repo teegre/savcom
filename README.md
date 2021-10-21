@@ -51,9 +51,9 @@ dalias version
 
 ## Options.
 
-Invoked without options, **dalias** reads from standard input.
+Invoked without argument, **dalias** reads from standard input.
 
-Available options are:
+Available commands are:
 
 *  do: create/replace.
 *  ed: edit.
