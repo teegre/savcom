@@ -7,18 +7,16 @@ MANDIR    ?= $(SHAREDIR)/man/man1
 MANPAGE    = $(PROGNAME).1
 
 .PHONY: install
-install: src/$(PROGNAME).out
-	install -d  $(DESTDIR)$(BINDIR)
+install: src/$(PROGNAME)
+	install -d  $(BINDIR)
 
-	install -m755  src/$(PROGNAME).out $(DESTDIR)$(BINDIR)/$(PROGNAME)
+	install -m755  src/$(PROGNAME).sh $(BINDIR)/$(PROGNAME)
 	
-	install -Dm644 $(MANPAGE) -t $(DESTDIR)$(MANDIR)
-	install -Dm644 LICENSE    -t $(DESTDIR)$(SHAREDIR)/licenses/$(PROGNAME)
-
-	rm src/$(PROGNAME).out
+	install -Dm644 $(MANPAGE) -t $(MANDIR)
+	install -Dm644 LICENSE    -t $(SHAREDIR)/licenses/$(PROGNAME)
 
 .PHONY: uninstall
 uninstall:
-	rm $(DESTDIR)$(BINDIR)/$(PROGNAME)
-	rm $(DESTDIR)$(MANDIR)/$(MANPAGE)
-	rm -rf $(DESTDIR)$(SHAREDIR)/licenses/$(PROGNAME)
+	rm $(BINDIR)/$(PROGNAME)
+	rm $(MANDIR)/$(MANPAGE)
+	rm -rf $(SHAREDIR)/licenses/$(PROGNAME)
