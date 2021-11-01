@@ -12,7 +12,6 @@ install: src/$(PROGNAME).sh
 	install -m755  src/$(PROGNAME).sh $(BINDIR)/$(PROGNAME)
 	install -Dm644 $(MANPAGE) -t $(MANDIR)
 	install -Dm644 LICENSE    -t $(SHAREDIR)/licenses/$(PROGNAME)
-	rm src/dalias
 
 .PHONY: uninstall
 uninstall:
