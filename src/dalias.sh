@@ -3,7 +3,7 @@
 #  __)) ___  )) _  ___  __
 # ((_( ((_( (( (( ((_( _))
 #
-# Copyright (C) 2021, Stéphane MEYER.
+# Copyright (C) 2022, Stéphane MEYER.
 #
 # Dalias is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
