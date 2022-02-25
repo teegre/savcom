@@ -197,6 +197,9 @@ rm_alias() {
       _msg E "${name}: no such alias."
       return 1
     }
+    [[ $NOCONFIRM ]] || {
+      confirm "warning: delete '${name}' dynamic alias?" || return 1
+    }
 
     rm "$link" "$dst" 2> /dev/null || {
       _msg E "${name}: could not delete dynamic alias"
