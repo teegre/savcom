@@ -20,10 +20,10 @@
 #
 # DALIAS
 # C : 2021/04/19
-# M : 2021/10/21
+# M : 2022/02/25
 # D : Dynamic aliases.
 
-declare __version="0.1.3"
+declare __version="0.1.4"
 
 declare ALIASDIR="$HOME/.config/dalias/aliases"
 declare BINDIR="$HOME/.local/bin"
