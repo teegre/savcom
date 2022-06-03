@@ -58,7 +58,7 @@ Available commands are:
 
 *  do: create/replace.
 *  ed: edit.
-*  cp: rename.
+*  cp: copy.
 *  mv: rename.
 *  rm: delete.
 *  dp: dump existing aliases into a file.
