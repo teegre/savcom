@@ -20,10 +20,10 @@
 #
 # DALIAS
 # C : 2021/04/19
-# M : 2022/02/25
+# M : 2022/06/03
 # D : Dynamic aliases.
 
-declare __version="0.1.4"
+declare __version="0.1.5"
 
 declare ALIASDIR="$HOME/.config/dalias/aliases"
 declare BINDIR="$HOME/.local/bin"
@@ -37,6 +37,7 @@ Commands:
   dalias                                 - reads from standard input.
   dalias do <name> <command> [arguments] - create/replace.
   dalias ed <name>                       - edit.
+  dalias cp <name> <newname>             - copy.
   dalias mv <name> <newname>             - rename.
   dalias rm <name>                       - delete.
   dalias dp <file>                       - dump existing aliases in a file.
@@ -144,6 +145,44 @@ ed_alias() {
     "${EDITOR}" "$da"
   else
     _msg E "${name}: no such dynamic alias."
+    return 1
+  fi
+}
+
+cp_alias() {
+  local from to
+  from="$1"
+  to="$2"
+
+  [[ ! $from || ! $to ]] && {
+    _msg E "missing parameters."
+    return 1
+  }
+
+  which "$to" &> /dev/null && {
+    _msg E "${to} is an existing command/alias."
+    return 1
+  }
+
+  local alias_src link_src
+  alias_src="${ALIASDIR}/${from}.da"
+  link_src="${BINDIR}/${from}"
+
+  if [[ -a $alias_src ]] && [[ -L $link_src ]]; then
+    local alias_dst link_dst
+    alias_dst="${ALIASDIR}/${to}.da"
+    link_dst="${BINDIR}/${to}"
+
+    cp "$alias_src" "$alias_dst" 2> /dev/null || {
+      _msg E "${from} -> ${to}: could not copy."
+      return 1
+    }
+
+    rm "$link_src"
+    ln -s "$alias_dst" "$link_dst" &&
+      _msg M "${from} -> ${to}: dynamic alias copied."
+  else
+    _msg E "no such dynamic alias: ${from}."
     return 1
   fi
 }
@@ -259,6 +298,7 @@ if (( $# > 0 )); then
   case $1 in
     do     ) shift; do_alias "$@" ;;
     ed     ) shift; ed_alias "$@" ;;
+    cp     ) shift; cp_alias "$@" ;;
     mv     ) shift; mv_alias "$@" ;;
     rm     ) shift; rm_alias "$@" ;;
     dp     ) shift; dp_alias "$@" ;;
@@ -275,8 +315,10 @@ else
 
     # ignore comments, dp, ed, ls and help commands...
     [[ $REPLY =~ ^#.*$ ]] && continue
-    [[ $REPLY =~ ^dp.*$ ]] && continue
+    [[ $REPLY =~ ^cp.*$ ]] && continue
+    [[ $REPLY =~ ^mv.*$ ]] && continue
     [[ $REPLY =~ ^ed.*$ ]] && continue
+    [[ $REPLY =~ ^dp.*$ ]] && continue
     [[ $REPLY =~ ^ls.*$ ]] && continue
     [[ $REPLY =~ ^help.*$ ]] && continue
 

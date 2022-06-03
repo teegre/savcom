@@ -22,7 +22,7 @@ bash coreutils
 
 ## Install.
 
-Clone this repository: `git clone https://gitlab.com/teegre/dalias.git`
+Clone this repository: `git clone https://github.com/teegre/dalias.git`
 
 Then:
 
@@ -41,6 +41,7 @@ environment variable is set to your favorite text editor.
 ```
 dalias do <name> <command> [arguments]
 dalias ed <name>
+dalias cp <name> <newname>
 dalias mv <name> <newname>
 dalias rm <name>
 dalias dp <file>
@@ -57,6 +58,7 @@ Available commands are:
 
 *  do: create/replace.
 *  ed: edit.
+*  cp: rename.
 *  mv: rename.
 *  rm: delete.
 *  dp: dump existing aliases into a file.
