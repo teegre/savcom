@@ -22,15 +22,25 @@ bash coreutils
 
 ## Install.
 
-Clone this repository: `git clone https://github.com/teegre/dalias.git`
+Clone this repository:
+
+`git clone https://github.com/teegre/dalias.git`
 
 Then:
+
+`cd dalias`
+
+And:
 
 `make install`
 
 **Important**: Make sure you have a directory called `.local/bin` in your home  
 directory, and that it is included in your `$PATH`. Also make sure `$EDITOR`  
 environment variable is set to your favorite text editor.
+
+To create default aliases for **dalias**, run this command:
+
+`dalias < aliases/default`
 
 ## Uninstall.
 
@@ -59,13 +69,13 @@ Invoked without argument, **dalias** reads from standard input.
 
 Available commands are:
 
-*  do: create/replace.
-*  ed: edit.
-*  cp: copy.
-*  mv: rename.
-*  rm: delete.
-*  dp: dump existing aliases into a file.
-*  ls: print/search dynamic alias list.
+*  do: create/replace. (ddo)
+*  ed: edit. (ded)
+*  cp: copy. (dcp)
+*  mv: rename. (dmv)
+*  rm: delete. (drm)
+*  dp: dump existing aliases into a file. (ddp)
+*  ls: print/search dynamic alias list. (dls)
 *  help: show help and exit.
 *  version: show program version and exit.
 
