@@ -52,13 +52,18 @@ Available commands are:
     - version: show program version and exit\.
 .P
 (1) Make sure \fB$EDITOR\fR environment variable is set.
-.SH "BATCH ALIASING"
+.SH "SAVE/RESTORE ALIASES"
 .P
-Since \fBdalias\fR reads from stdin, it is possible to create a bunch of aliases from a file\.
+You may want to save your aliases, for instance, to use them on another computer\.
 .br
-(See \fBSAVE DYNAMIC ALIASES INTO A FILE\fR below\.)
-.P
-The syntax is as follow:
+To do so:
+.IP "" 4
+.nf
+\fBdalias\fR dp <\fIfile\fR>
+.fi
+.IP "" 0
+To restore your aliases, the syntax is as follow:
+.br
 .IP "" 4
 .nf
 \fBdalias\fR < file
@@ -72,21 +77,8 @@ cat file | \fBdalias\fR
 .fi
 .IP "" 0
 .P
-Each line of the file must contain \fBdalias\fR \fIdo\fR or \fIrm\fR commands:
-.P
-<\fIdalias_command\fR> <\fIalias_name\fR> [<\fIcommand\fR> [\fIarguments\fR]]
-.P
 While processing, \fBdalias\fR skips if an error is encountered and indicates on which line the error occured\.
-.SH "SAVE DYNAMIC ALIASES INTO A FILE"
 .br
-You may want to save your aliases, for instance, to use them on another computer\.
-.br
-To do so:
-.IP "" 4
-.nf
-\fBdalias\fR dp <\fIfile\fR>
-.fi
-.IP "" 0
 .SH "DIRECTORIES"
 Dynamic aliases are stored in \fB$HOME/\.config/dalias/aliases\fR directory\. And they are symlinked to
 .br
