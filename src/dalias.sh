@@ -23,7 +23,7 @@
 # M : 2022/06/06
 # D : Dynamic aliases.
 
-declare __version="0.1.6"
+declare __version="0.1.7"
 
 declare ALIASDIR="$HOME/.config/dalias/aliases"
 declare BINDIR="$HOME/.local/bin"
@@ -93,13 +93,13 @@ do_alias() {
   local _alias
   _alias="$(which "$name" 2> /dev/null)" && {
     if [[ $(readlink -f "$_alias") =~ \.da$ ]]; then
+      [[ $NOCONFIRM ]] && {
+        _msg M "skipped: $name already exists."
+        return 0
+      }
       _msg W "a dynamic alias named '${name}' already exists."
-      [[ $NOCONFIRM ]] && return 0
       confirm "overwrite?" || return 1
       local FORCE=1
-    else
-      _msg E "$name already exists."
-      return 1
     fi
   }
 
