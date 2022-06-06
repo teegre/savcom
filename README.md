@@ -39,15 +39,18 @@ environment variable is set to your favorite text editor.
 ## Usage
 
 ```
-dalias do <name> <command> [arguments]
+dalias do <name> <command>
+dalias do <name> '<command> <arguments>'
 dalias ed <name>
 dalias cp <name> <newname>
 dalias mv <name> <newname>
 dalias rm <name>
 dalias dp <file>
-dalias ls [name|glob]
+dalias ls [name|"glob"]
 dalias help
 dalias version
+dalias < <file>
+cat <file> | dalias
 ```
 
 ## Options.
@@ -68,7 +71,7 @@ Available commands are:
 
 ## Examples
 
-To create a dynamic alias called *da* for **dalias**:
+### To create a dynamic alias called *da* for **dalias**:
 
 ```
 > dalias do da dalias '"$@"'
@@ -78,14 +81,36 @@ da: dynamic alias created.
 The `'"$@"'` is mandatory here, since we want be able to pass options to **dalias**.  
 Also notice the surrounding single quotes. They are needed to prevent the shell from interpreting "$@".
 
-Save aliases into a file: `dalias dp aliases.txt`
+It is good practice to quote commands, like so:
 
-Remove all aliases:
+```
+> dalias do ma 'if [ -f ./manage.py ]; then ./manage.py "$@"; else echo "Not a Django project directory!"; fi'
+> ma: dynamic alias created.
+```
+
+Otherwise it gets a little tricky :
+```
+> dalias do ma if \[ -f ./manage.py \]\; then ./manage.py '"$@"'\; else echo '"Not a Django projet directory!"'\; fi
+> ma: dynamic alias created.
+
+```
+
+This alias launches Django's command-line utility *manage.py* if it can be found in the current directory.
+
+
+### Save aliases into a file:
+
+`dalias dp aliases.txt`
+
+
+### Remove all aliases:
 
 ```
 while read -r; do echo "rm $REPLY" | cut -d '=' -f 1 | dalias; done < <(dalias ls)
 ```
 
-Restore aliases from file: `dalias < aliases.txt`
+
+### Restore aliases from a file:
+`dalias < aliases.txt`
 
 For more info, please read `man dalias`.
