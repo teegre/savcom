@@ -20,10 +20,10 @@
 #
 # DALIAS
 # C : 2021/04/19
-# M : 2022/06/03
+# M : 2022/06/06
 # D : Dynamic aliases.
 
-declare __version="0.1.5"
+declare __version="0.1.6"
 
 declare ALIASDIR="$HOME/.config/dalias/aliases"
 declare BINDIR="$HOME/.local/bin"
@@ -149,8 +149,9 @@ ed_alias() {
   fi
 }
 
-cp_alias() {
-  local from to
+op_alias() {
+  local cmd from to msg
+  cmd=$1; shift
   from="$1"
   to="$2"
 
@@ -173,52 +174,19 @@ cp_alias() {
     alias_dst="${ALIASDIR}/${to}.da"
     link_dst="${BINDIR}/${to}"
 
-    cp "$alias_src" "$alias_dst" 2> /dev/null || {
-      _msg E "${from} -> ${to}: could not copy."
+    "$cmd" "$alias_src" "$alias_dst" 2> /dev/null || {
+      [[ $cmd  == "cp" ]] && msg="copy"
+      [[ $cmd  == "mv" ]] && msg="rename"
+      _msg E "${from} -> ${to}: could not ${msg}."
       return 1
     }
 
     rm "$link_src"
-    ln -s "$alias_dst" "$link_dst" &&
-      _msg M "${from} -> ${to}: dynamic alias copied."
-  else
-    _msg E "no such dynamic alias: ${from}."
-    return 1
-  fi
-}
-
-mv_alias() {
-  local from to
-  from="$1"
-  to="$2"
-
-  [[ ! $from || ! $to ]] && {
-    _msg E "missing parameters."
-    return 1
-  }
-
-  which "$to" &> /dev/null && {
-    _msg E "${to} is an existing command/alias."
-    return 1
-  }
-
-  local alias_src link_src
-  alias_src="${ALIASDIR}/${from}.da"
-  link_src="${BINDIR}/${from}"
-
-  if [[ -a $alias_src ]] && [[ -L $link_src ]]; then
-    local alias_dst link_dst
-    alias_dst="${ALIASDIR}/${to}.da"
-    link_dst="${BINDIR}/${to}"
-
-    mv "$alias_src" "$alias_dst" 2> /dev/null || {
-      _msg E "${from} -> ${to}: could not rename."
-      return 1
+    ln -s "$alias_dst" "$link_dst" && {
+      [[ $cmd  == "cp" ]] && msg="copied"
+      [[ $cmd  == "mv" ]] && msg="renamed"
+      _msg M "${from} -> ${to}: dynamic alias ${msg}."
     }
-
-    rm "$link_src"
-    ln -s "$alias_dst" "$link_dst" &&
-      _msg M "${from} -> ${to}: dynamic alias renamed."
   else
     _msg E "no such dynamic alias: ${from}."
     return 1
@@ -298,8 +266,8 @@ if (( $# > 0 )); then
   case $1 in
     do     ) shift; do_alias "$@" ;;
     ed     ) shift; ed_alias "$@" ;;
-    cp     ) shift; cp_alias "$@" ;;
-    mv     ) shift; mv_alias "$@" ;;
+    cp     ) shift; op_alias "cp" "$@" ;;
+    mv     ) shift; op_alias "mv" "$@" ;;
     rm     ) shift; rm_alias "$@" ;;
     dp     ) shift; dp_alias "$@" ;;
     ls     ) shift; ls_alias "$@" ;;
