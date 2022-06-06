@@ -44,9 +44,9 @@ To create default aliases for **dalias**, run this command:
 
 ## Uninstall.
 
-`make uninstall`
+[Remove all aliases](#remove)
 
-[Delete all aliases](#remove)
+`make uninstall`
 
 ## Usage
 
