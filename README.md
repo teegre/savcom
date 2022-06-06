@@ -46,6 +46,8 @@ To create default aliases for **dalias**, run this command:
 
 `make uninstall`
 
+[Delete all aliases](#remove)
+
 ## Usage
 
 ```
@@ -113,7 +115,7 @@ This alias launches Django's command-line utility *manage.py* if it can be found
 `dalias dp aliases.txt`
 
 
-### Remove all aliases:
+### Remove all aliases: <a name="remove"></a>
 
 ```
 while read -r; do echo "rm $REPLY" | cut -d '=' -f 1 | dalias; done < <(dalias ls)
