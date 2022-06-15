@@ -20,10 +20,10 @@
 #
 # DALIAS
 # C : 2021/04/19
-# M : 2022/06/06
+# M : 2022/06/15
 # D : Dynamic aliases.
 
-declare __version="0.1.7"
+declare __version="0.1.8"
 
 declare ALIASDIR="$HOME/.config/dalias/aliases"
 declare BINDIR="$HOME/.local/bin"
@@ -181,7 +181,7 @@ op_alias() {
       return 1
     }
 
-    rm "$link_src"
+    [[ $cmd == "mv" ]] && rm "$link_src"
     ln -s "$alias_dst" "$link_dst" && {
       [[ $cmd  == "cp" ]] && msg="copied"
       [[ $cmd  == "mv" ]] && msg="renamed"
