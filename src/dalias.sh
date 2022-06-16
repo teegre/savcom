@@ -20,10 +20,10 @@
 #
 # DALIAS
 # C : 2021/04/19
-# M : 2022/06/15
+# M : 2022/06/16
 # D : Dynamic aliases.
 
-declare __version="0.1.8"
+declare __version="0.1.9"
 
 declare ALIASDIR="$HOME/.config/dalias/aliases"
 declare BINDIR="$HOME/.local/bin"
@@ -208,7 +208,8 @@ rm_alias() {
       confirm "warning: delete '${name}' dynamic alias?" || return 1
     }
 
-    rm "$link" "$dst" 2> /dev/null || {
+    rm "$link" 2> /dev/null
+    rm "$dst" 2> /dev/null || {
       _msg E "${name}: could not delete dynamic alias"
       return 1
     }
