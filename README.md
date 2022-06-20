@@ -102,7 +102,7 @@ It is good practice to quote commands, like so:
 
 Otherwise it gets a little tricky :
 ```
-> dalias do ma if \[ -f ./manage.py \]\; then ./manage.py '"$@"'\; else echo '"Not a Django projet directory!"'\; fi
+> dalias do ma if \[ -f ./manage.py \]\; then ./manage.py '"$@"'\; else echo '"Not a Django project directory!"'\; fi
 > ma: dynamic alias created.
 
 ```
