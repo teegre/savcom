@@ -20,10 +20,13 @@
 #
 # DALIAS
 # C : 2021/04/19
-# M : 2022/06/16
+# M : 2022/08/03
 # D : Dynamic aliases.
 
-declare __version="0.1.9"
+# TODO: Add optional description for dynamic aliases,
+#       --desc
+
+declare __version="0.2.0"
 
 declare ALIASDIR="$HOME/.config/dalias/aliases"
 declare BINDIR="$HOME/.local/bin"
@@ -34,35 +37,35 @@ dalias: version ${__version}.
 Dynamic aliases.
 
 Commands:
-  dalias                                 - reads from standard input.
-  dalias do <name> <command> [arguments] - create/replace.
-  dalias ed <name>                       - edit.
-  dalias cp <name> <newname>             - copy.
-  dalias mv <name> <newname>             - rename.
-  dalias rm <name>                       - delete.
-  dalias dp <file>                       - dump existing aliases in a file.
-  dalias ls [name|glob]                  - print aliases list.
-  dalias help                            - show this help and exit.
-  dalias version                         - show program version and exit.
+  dalias                                   - reads from standard input.
+  dalias do <name> '<command> [arguments]' - create/replace.
+  dalias ed <name>                         - edit.
+  dalias cp <name> <newname>               - copy.
+  dalias mv <name> <newname>               - rename.
+  dalias rm <name>                         - delete.
+  dalias dp <file>                         - dump existing aliases in a file.
+  dalias ls [name|glob]                    - print aliases list.
+  dalias help                              - show this help and exit.
+  dalias version                           - show program version and exit.
 
 HELP
 }
 
 _msg() {
   # error/message display.
+
   local _type msg
 
   case $1 in
     E) _type="error: "; msg="$2" ;;   # error
-    M) msg="$2" ;;                    # message
     W) _type="warning: "; msg="$2" ;; # warning
+    M) msg="$2"                       # message
   esac
 
-  if [[ $1 == "E" || $1 == "W" ]]; then
-    >&2 echo "${_type}${msg}"
-  else
-    echo "$msg"
-  fi
+  case $1 in
+    E | W ) >&2 echo "${_type}${msg}" ;;
+        M ) echo "$msg"
+  esac
 }
 
 confirm() {
@@ -78,7 +81,7 @@ confirm() {
 }
 
 do_alias() {
-  # create/modify a new dynamic alias
+  # create/modify given dynamic alias
   
   local name cmd
   name=$1; shift
@@ -141,7 +144,6 @@ ed_alias() {
       _msg E "EDITOR environment variable not set."
       return 1
     }
-
     "${EDITOR}" "$da"
   else
     _msg E "${name}: no such dynamic alias."
