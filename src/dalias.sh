@@ -45,6 +45,7 @@ Commands:
   dalias rm <name>                         - delete.
   dalias dp <file>                         - dump existing aliases in a file.
   dalias ls [name|glob]                    - print aliases list.
+  dalias fix                               - search and fix missing links.
   dalias help                              - show this help and exit.
   dalias version                           - show program version and exit.
 
@@ -268,6 +269,25 @@ dp_alias() {
   _msg M "done."
 }
 
+fix_aliases() {
+  # search and fix missing alias links.
+  local f name count=0
+  for f in ${ALIASDIR}/*.da; do
+    name="$(basename $f)"
+    name="${name//.da}"
+    which "${BINDIR}/${name}" 2> /dev/null || {
+      ln -s "$f" "${BINDIR}/${name}" && {
+        _msg M "${name}: missing [fixed]"
+        ((count++))
+    }
+  }
+  done
+  ((count)) &&
+    _msg "fixed $((count)) links."
+  ((count)) ||
+    _msg M "nothing to do."
+}
+
 if (( $# > 0 )); then
   case $1 in
     do     ) shift; do_alias "$@" ;;
@@ -277,6 +297,7 @@ if (( $# > 0 )); then
     rm     ) shift; rm_alias "$@" ;;
     dp     ) shift; dp_alias "$@" ;;
     ls     ) shift; ls_alias "$@" ;;
+    fix    ) shift; fix_aliases   ;;
     help   ) _help ;;
     version) _msg M "dalias version ${__version}." ;;
     *      ) _msg E "invalid command: $1"; exit 1
@@ -295,6 +316,7 @@ else
     [[ $REPLY =~ ^dp.*$ ]] && continue
     [[ $REPLY =~ ^ls.*$ ]] && continue
     [[ $REPLY =~ ^help.*$ ]] && continue
+    [[ $REPLY =~ ^fix.*$ ]] && continue
 
     mapfile -t arglist <<< "${REPLY// /$'\n'}"
     set -- "${arglist[@]}"
