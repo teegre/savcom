@@ -59,6 +59,7 @@ dalias mv <name> <newname>
 dalias rm <name>
 dalias dp <file>
 dalias ls [name|"glob"]
+dalias fix
 dalias help
 dalias version
 dalias < <file>
@@ -78,6 +79,7 @@ Available commands are:
 *  rm: delete. (drm)
 *  dp: dump existing aliases into a file. (ddp)
 *  ls: print/search dynamic alias list. (dls)
+*  fix: fix missing links.
 *  help: show help and exit.
 *  version: show program version and exit.
 
