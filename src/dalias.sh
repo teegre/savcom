@@ -275,7 +275,7 @@ fix_aliases() {
   for f in ${ALIASDIR}/*.da; do
     name="$(basename $f)"
     name="${name//.da}"
-    which "${BINDIR}/${name}" 2> /dev/null || {
+    which "${BINDIR}/${name}" &> /dev/null || {
       ln -s "$f" "${BINDIR}/${name}" && {
         _msg M "${name}: missing [fixed]"
         ((count++))
@@ -283,7 +283,7 @@ fix_aliases() {
   }
   done
   ((count)) &&
-    _msg "fixed $((count)) links."
+    _msg M "fixed $((count)) links."
   ((count)) ||
     _msg M "nothing to do."
 }
