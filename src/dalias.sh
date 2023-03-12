@@ -20,13 +20,13 @@
 #
 # DALIAS
 # C : 2021/04/19
-# M : 2022/08/03
+# M : 2023/03/12
 # D : Dynamic aliases.
 
 # TODO: Add optional description for dynamic aliases,
 #       --desc
 
-declare __version="0.2.0"
+declare __version="0.2.1"
 
 declare ALIASDIR="$HOME/.config/dalias/aliases"
 declare BINDIR="$HOME/.local/bin"
@@ -103,6 +103,9 @@ do_alias() {
       _msg W "a dynamic alias named '${name}' already exists."
       confirm "overwrite?" || return 1
       local FORCE=1
+    else
+      _msg E "'${name}' found in ${_alias}."
+      return 1
     fi
   }
 
