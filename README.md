@@ -20,7 +20,7 @@ Imagine you're working on a software project that involves multiple steps for bu
 Each step requires running several commands, and remembering or typing them out every time can be tedious and error-prone.
 This is where the **savcom** comes in handy.
 
-*  Creating Command Shortcuts:
+### Creating Command Shortcuts:
 
 You can use the `do` command to create shortcuts for each step of your workflow. For example:
 
@@ -29,7 +29,7 @@ $ savcom do build 'npm install && npm run build'
 $ savcom do deploy 'git push origin master && ssh server "bash deploy.sh"'
 ```
 
-* Simplifying Commands:
+### Simplifying Commands:
 
 Instead of typing out lengthy commands, you can now execute them using their shortcuts:
 
