@@ -12,6 +12,32 @@ Save commands
 
 **Savcom** is a tool for managing command shortcuts efficiently, allowing users to create, modify, list, and delete them easily.
 
+## What's the use?
+
+One common use case for **savcom** would be in a development environment where users frequently need to execute complex commands or sequences of commands.
+
+Imagine you're working on a software project that involves multiple steps for building, testing, and deploying the application.
+Each step requires running several commands, and remembering or typing them out every time can be tedious and error-prone.
+This is where the **savcom** comes in handy.
+
+*  Creating Command Shortcuts:
+
+You can use the `do` command to create shortcuts for each step of your workflow. For example:
+
+```shell
+$ savcom do build 'npm install && npm run build'
+$ savcom do test 'npm test'
+$ savcom do deploy 'git push origin master && ssh server "bash deploy.sh"'
+```
+
+* Simplifying Commands: Instead of typing out lengthy commands, you can now execute them using their shortcuts:
+
+```shell
+$ build
+$ test
+$ deploy
+```
+
 ## Dependencies.
 
 bash coreutils
@@ -40,7 +66,7 @@ To create default shortcuts for **savcom**, run this command:
 
 ## Uninstall.
 
-[Remove all aliases](#remove)
+[Remove all shortcuts](#remove)
 
 `# make uninstall`
 
@@ -101,24 +127,30 @@ ma: command shortcut created.
 Otherwise it gets a little tricky :
 ```
 $ savcom do ma if \[ -f ./manage.py \]\; then ./manage.py '"$@"'\; else echo '"Not a Django project directory!"'\; fi
-ma: dynamic alias created.
+ma: command shortcut created.
 
 ```
 
-This alias launches Django's command-line utility *manage.py* if it can be found in the current directory.
+This shortcut launches Django's command-line utility *manage.py* if it can be found in the current directory.
 
+Now, to invoke a shortcut, simply type it on the command line, i.e: 
 
-### Save aliases into a file:
+```
+$ sco version
+savcom version 0.2.1.
+```
+
+### Save command shortcuts into a file:
 
 `savcom dp shortcuts.txt`
 
-### Remove all aliases: <a name="remove"></a>
+### Remove all shortcuts: <a name="remove"></a>
 
 ```
 while read -r; do echo "rm $REPLY" | cut -d '=' -f 1 | savcom; done < <(savcom ls)
 ```
 
-### Restore aliases from a file:
+### Restore shortcuts from a file:
 `savcom < shortcuts.txt`
 
 For more info, please read `man savcom`.
