@@ -16,7 +16,7 @@ Save commands
 
 One common use case for **savcom** would be in a development environment where users frequently need to execute complex commands or sequences of commands.
 
-Imagine you're working on a software project that involves multiple steps for building, testing, and deploying the application.
+Imagine you're working on a software project that involves multiple steps for building and deploying the application.
 Each step requires running several commands, and remembering or typing them out every time can be tedious and error-prone.
 This is where the **savcom** comes in handy.
 
@@ -26,15 +26,15 @@ You can use the `do` command to create shortcuts for each step of your workflow.
 
 ```shell
 $ savcom do build 'npm install && npm run build'
-$ savcom do test 'npm test'
 $ savcom do deploy 'git push origin master && ssh server "bash deploy.sh"'
 ```
 
-* Simplifying Commands: Instead of typing out lengthy commands, you can now execute them using their shortcuts:
+* Simplifying Commands:
+
+Instead of typing out lengthy commands, you can now execute them using their shortcuts:
 
 ```shell
 $ build
-$ test
 $ deploy
 ```
 
@@ -56,9 +56,8 @@ And:
 
 `# make install`
 
-**Important**: Make sure you have a directory called `.local/bin` in your home  
-directory, and that it is included in your `$PATH`. Also make sure `$EDITOR`  
-environment variable is set to your favorite text editor.
+**Important**: Make sure you have a directory called `.local/bin` in your home directory, and that it is included in your `$PATH`.
+Also make sure `$EDITOR` environment variable is set to your favorite text editor.
 
 To create default shortcuts for **savcom**, run this command:
 
