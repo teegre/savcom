@@ -18,7 +18,7 @@ One common use case for **savcom** would be in a development environment where u
 
 Imagine you're working on a software project that involves multiple steps for building and deploying the application.
 Each step requires running several commands, and remembering or typing them out every time can be tedious and error-prone.
-This is where the **savcom** comes in handy.
+This is where **savcom** comes in handy.
 
 ### Creating Command Shortcuts:
 
@@ -113,7 +113,7 @@ $ savcom do sco savcom '"$@"'
 sco: command shotcut created.
 ```
 
-The `"$@"` is mandatory here, since we want be able to pass options to **savcom**.  
+The `'"$@"'` is mandatory here, since we want be able to pass options to **savcom**.  
 Also notice the surrounding single quotes. They are needed to prevent the shell from interpreting "$@".
 
 It is good practice to quote commands, like so:
@@ -127,7 +127,6 @@ Otherwise it gets a little tricky :
 ```
 $ savcom do ma if \[ -f ./manage.py \]\; then ./manage.py '"$@"'\; else echo '"Not a Django project directory!"'\; fi
 ma: command shortcut created.
-
 ```
 
 This shortcut launches Django's command-line utility *manage.py* if it can be found in the current directory.
