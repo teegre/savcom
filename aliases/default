@@ -1,8 +1,0 @@
-# default aliases for dalias command.
-do ddo dalias do "$@"
-do ded dalias ed "$@"
-do dcp dalias cp "$@"
-do dmv dalias mv "$@"
-do drm dalias rm "$@"
-do ddp dalias dp "$@"
-do dls dalias ls "$@"

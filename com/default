@@ -1,0 +1,8 @@
+# default aliases for savcom commands.
+do cdo savcom do "$@"
+do ced savcom ed "$@"
+do ccp savcom cp "$@"
+do cmv savcom mv "$@"
+do crm savcom rm "$@"
+do cdp savcom dp "$@"
+do cls savcom ls "$@"

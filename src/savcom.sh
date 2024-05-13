@@ -1,11 +1,12 @@
 #! /usr/bin/env bash
-#    _       _  o         
-#  __)) ___  )) _  ___  __
-# ((_( ((_( (( (( ((_( _))
+#  ___  __ ___   _____ ___  _ __ ___  
+# / __|/ _` \ \ / / __/ _ \| '_ ` _ \ 
+# \__ \ (_| |\ V / (_| (_) | | | | | |
+# |___/\__,_| \_/ \___\___/|_| |_| |_|
+#                                     
+# Copyright (C) 2021-2024, Stéphane MEYER.
 #
-# Copyright (C) 2022, Stéphane MEYER.
-#
-# Dalias is free software: you can redistribute it and/or modify
+# SAVCOM is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
@@ -18,36 +19,33 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <https://www.gnu.org/licenses/>
 #
-# DALIAS
+# SAVCOM
 # C : 2021/04/19
-# M : 2023/03/12
-# D : Dynamic aliases.
-
-# TODO: Add optional description for dynamic aliases,
-#       --desc
+# M : 2024/05/13
+# D : Save commands.
 
 declare __version="0.2.1"
 
-declare ALIASDIR="$HOME/.config/dalias/aliases"
+declare SAVDIR="$HOME/.config/savcom/com"
 declare BINDIR="$HOME/.local/bin"
 
 _help() {
 cat << HELP
-dalias: version ${__version}.
-Dynamic aliases.
+savcom: version ${__version}.
+Save commands.
 
 Commands:
-  dalias                                   - reads from standard input.
-  dalias do <name> '<command> [arguments]' - create/replace.
-  dalias ed <name>                         - edit.
-  dalias cp <name> <newname>               - copy.
-  dalias mv <name> <newname>               - rename.
-  dalias rm <name>                         - delete.
-  dalias dp <file>                         - dump existing aliases in a file.
-  dalias ls [name|glob]                    - print aliases list.
-  dalias fix                               - search and fix missing links.
-  dalias help                              - show this help and exit.
-  dalias version                           - show program version and exit.
+  savcom                                   - reads from standard input.
+  savcom do <name> '<command> [arguments]' - create/replace.
+  savcom ed <name>                         - edit.
+  savcom cp <name> <newname>               - copy.
+  savcom mv <name> <newname>               - rename.
+  savcom rm <name>                         - delete.
+  savcom dp <file>                         - dump existing shortcuts in a file.
+  savcom ls [name|glob]                    - print shortcuts list.
+  savcom fix                               - search and fix broken/missing shortcut links.
+  savcom help                              - show this help and exit.
+  savcom version                           - show program version and exit.
 
 HELP
 }
@@ -81,8 +79,8 @@ confirm() {
   return 1
 }
 
-do_alias() {
-  # create/modify given dynamic alias
+do_com() {
+  # create/modify given command shortcut
   
   local name cmd
   name=$1; shift
@@ -93,69 +91,69 @@ do_alias() {
     return 1
   }
 
-  # does alias already exist?
-  local _alias
-  _alias="$(which "$name" 2> /dev/null)" && {
-    if [[ $(readlink -f "$_alias") =~ \.da$ ]]; then
+  # does command shortcut already exist?
+  local _com
+  _com="$(which "$name" 2> /dev/null)" && {
+    if [[ $(readlink -f "$_com") =~ \.com$ ]]; then
       [[ $NOCONFIRM ]] && {
         _msg M "skipped: $name already exists."
         return 0
       }
-      _msg W "a dynamic alias named '${name}' already exists."
+      _msg W "a command shortcut named '${name}' already exists."
       confirm "overwrite?" || return 1
       local FORCE=1
     else
-      _msg E "'${name}' found in ${_alias}."
+      _msg E "'${name}' found in ${_com}."
       return 1
     fi
   }
 
-  [[ -d $ALIASDIR ]] ||
-    mkdir -p "$ALIASDIR"
+  [[ -d $SAVDIR ]] ||
+    mkdir -p "$SAVDIR"
 
-  local da
-  da="$ALIASDIR/${name}.da"
+  local com
+  com="$SAVDIR/${name}.com"
 
   local script
 
-read -d "" -r script <<- DALIAS
+read -d "" -r script <<- SAVCOM
 #! /usr/bin/env sh
 ${cmd[@]}
-DALIAS
+SAVCOM
 
-  echo -e "$script" > "$da"
-  chmod 700 "$da"
+  echo -e "$script" > "$com"
+  chmod 700 "$com"
 
   [[ $FORCE ]] && rm "${BINDIR}/${name}"
-  ln -s "$da" "${BINDIR}/${name}" &&
-    _msg M "${name}: dynamic alias created."
+  ln -s "$com" "${BINDIR}/${name}" &&
+    _msg M "${name}: command shortcut created."
 }
 
-ed_alias() {
+ed_com() {
   local name
   name="$1"
 
   [[ $name ]] || {
-    _msg E "dynamic alias name missing."
+    _msg E "command shortcut name missing."
     return 1
   }
 
-  local da
-  da="${ALIASDIR}/${name}.da"
+  local com
+  com="${SAVDIR}/${name}.com"
 
-  if [[ -a $da ]]; then
+  if [[ -a $com ]]; then
     [[ $EDITOR ]] || {
       _msg E "EDITOR environment variable not set."
       return 1
     }
-    "${EDITOR}" "$da"
+    "${EDITOR}" "$com"
   else
-    _msg E "${name}: no such dynamic alias."
+    _msg E "${name}: no such command shortcut."
     return 1
   fi
 }
 
-op_alias() {
+op_com() {
   local cmd from to msg
   cmd=$1; shift
   from="$1"
@@ -167,20 +165,20 @@ op_alias() {
   }
 
   which "$to" &> /dev/null && {
-    _msg E "${to} is an existing command/alias."
+    _msg E "${to} is an existing command/com."
     return 1
   }
 
-  local alias_src link_src
-  alias_src="${ALIASDIR}/${from}.da"
+  local com_src link_src
+  com_src="${SAVDIR}/${from}.com"
   link_src="${BINDIR}/${from}"
 
-  if [[ -a $alias_src ]] && [[ -L $link_src ]]; then
-    local alias_dst link_dst
-    alias_dst="${ALIASDIR}/${to}.da"
+  if [[ -a $com_src ]] && [[ -L $link_src ]]; then
+    local com_dst link_dst
+    com_dst="${SAVDIR}/${to}.com"
     link_dst="${BINDIR}/${to}"
 
-    "$cmd" "$alias_src" "$alias_dst" 2> /dev/null || {
+    "$cmd" "$com_src" "$com_dst" 2> /dev/null || {
       [[ $cmd  == "cp" ]] && msg="copy"
       [[ $cmd  == "mv" ]] && msg="rename"
       _msg E "${from} -> ${to}: could not ${msg}."
@@ -188,57 +186,57 @@ op_alias() {
     }
 
     [[ $cmd == "mv" ]] && rm "$link_src"
-    ln -s "$alias_dst" "$link_dst" && {
+    ln -s "$com_dst" "$link_dst" && {
       [[ $cmd  == "cp" ]] && msg="copied"
       [[ $cmd  == "mv" ]] && msg="renamed"
-      _msg M "${from} -> ${to}: dynamic alias ${msg}."
+      _msg M "${from} -> ${to}: command shortcut ${msg}."
     }
   else
-    _msg E "no such dynamic alias: ${from}."
+    _msg E "no such command shortcut: ${from}."
     return 1
   fi
 }
 
-rm_alias() {
+rm_com() {
   [[ $1 ]] && {
     local name dst link
     name="$1"
-    dst="${ALIASDIR}/${name}.da"
+    dst="${SAVDIR}/${name}.com"
     link="${BINDIR}/${name}"
 
     [[ -a $dst ]] || {
-      _msg E "${name}: no such alias."
+      _msg E "${name}: no such command shortcut."
       return 1
     }
     [[ $NOCONFIRM ]] || {
-      confirm "warning: delete '${name}' dynamic alias?" || return 1
+      confirm "warning: delete '${name}' command shortcut?" || return 1
     }
 
     rm "$link" 2> /dev/null
     rm "$dst" 2> /dev/null || {
-      _msg E "${name}: could not delete dynamic alias"
+      _msg E "${name}: could not delete command shortcut"
       return 1
     }
-    _msg M "${name}: dynamic alias deleted."
+    _msg M "${name}: command shortcut deleted."
     return 0
   }
-  _msg E "dynamic alias name missing."
+  _msg E "command shortcut name missing."
 }
 
-ls_alias() {
-  local _alias name cmd
+ls_com() {
+  local _com name cmd
 
   [[ $1 == "-d" ]] && { shift; local DUMP=1; }
   
-  [[ $1 ]] && _alias="$1" || _alias="*"
+  [[ $1 ]] && _com="$1" || _com="*"
 
-  compgen -G "${ALIASDIR}/${_alias}.da" &> /dev/null || {
+  compgen -G "${SAVDIR}/${_com}.com" &> /dev/null || {
     >&2 echo "no result."
     return 1
   }
   
-  for f in "${ALIASDIR}"/${_alias}.da; do
-    name="$(basename "${f%*.da}")"
+  for f in "${SAVDIR}"/${_com}.com; do
+    name="$(basename "${f%*.com}")"
     while read -r; do
       [[ $REPLY =~ ^#.+$ ]] && continue
       cmd="$REPLY"
@@ -251,8 +249,8 @@ ls_alias() {
   done
 }
 
-dp_alias() {
-  # dump existing dynamic aliases into a file.
+dp_com() {
+  # dump existing command shortcuts into a file.
 
   [[ $1 ]] || {
     _msg E "filename missing."
@@ -264,17 +262,26 @@ dp_alias() {
     confirm "overwrite?" || return 1
   }
 
-  ls_alias -d > "$1"
+  ls_com -d > "$1"
 
   _msg M "done."
 }
 
-fix_aliases() {
-  # search and fix missing alias links.
-  local f name count=0
-  for f in ${ALIASDIR}/*.da; do
+fix_coms() {
+  # search and fix broken/missing shortcut links.
+  local f name link state count=0
+  for f in ${SAVDIR}/*.com; do
     name="$(basename $f)"
-    name="${name//.da}"
+    name="${name//.com}"
+    # broken link
+    link="$(readlink -q ${BINDIR}/${name})"
+    [[ $link ]] && ! [[ -f "$link" ]] && {
+      if ! [[ -f $link ]]; then
+        confirm "warning: delete broken link ${name}?" &&
+          rm "${BINDIR}/${name}" &> /dev/null
+      fi
+    }
+    # missing link
     which "${BINDIR}/${name}" &> /dev/null || {
       ln -s "$f" "${BINDIR}/${name}" && {
         _msg M "${name}: missing [fixed]"
@@ -290,16 +297,16 @@ fix_aliases() {
 
 if (( $# > 0 )); then
   case $1 in
-    do     ) shift; do_alias "$@" ;;
-    ed     ) shift; ed_alias "$@" ;;
-    cp     ) shift; op_alias "cp" "$@" ;;
-    mv     ) shift; op_alias "mv" "$@" ;;
-    rm     ) shift; rm_alias "$@" ;;
-    dp     ) shift; dp_alias "$@" ;;
-    ls     ) shift; ls_alias "$@" ;;
-    fix    ) shift; fix_aliases   ;;
+    do     ) shift; do_com "$@" ;;
+    ed     ) shift; ed_com "$@" ;;
+    cp     ) shift; op_com "cp" "$@" ;;
+    mv     ) shift; op_com "mv" "$@" ;;
+    rm     ) shift; rm_com "$@" ;;
+    dp     ) shift; dp_com "$@" ;;
+    ls     ) shift; ls_com "$@" ;;
+    fix    ) shift; fix_coms   ;;
     help   ) _help ;;
-    version) _msg M "dalias version ${__version}." ;;
+    version) _msg M "savcom version ${__version}." ;;
     *      ) _msg E "invalid command: $1"; exit 1
   esac
 else
@@ -322,8 +329,8 @@ else
     set -- "${arglist[@]}"
     echo -n "${1}: "
     case $1 in
-      do) shift; do_alias "$@" || { _msg E "on line ${LINE}."; } ;;
-      rm) shift; rm_alias "$@" || { _msg E "on line ${LINE}."; } ;;
+      do) shift; do_com "$@" || { _msg E "on line ${LINE}."; } ;;
+      rm) shift; rm_com "$@" || { _msg E "on line ${LINE}."; } ;;
       * ) _msg E "invalid command: ${1} (line ${LINE})."; exit 1
     esac
   done

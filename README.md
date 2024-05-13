@@ -1,20 +1,16 @@
-# DALIAS
+# SAVCOM
 
 ```
-    _       _  o         
-  __)) ___  )) _  ___  __
- ((_( ((_( (( (( ((_( _))
+ ___  __ ___   _____ ___  _ __ ___
+/ __|/ _` \ \ / / __/ _ \| '_ ` _ \
+\__ \ (_| |\ V / (_| (_) | | | | | |
+|___/\__,_| \_/ \___\___/|_| |_| |_|
 ```
-Dynamic aliases.
+Save commands
 
 ## Description.
 
-I needed a quick way to create aliases on the fly without having to source any script.  
-So I wrote **dalias** for this purpose.
-
-Simply put, it creates a script containing the "aliased" command with its parameters  
-(stored in `$HOME/.config/dalias/aliases`), makes it executable and adds a symlink  
-to it in "$HOME/.local/bin" so it is immediately ready to use in any shell.
+**Savcom** is a tool for managing command shortcuts efficiently, allowing users to create, modify, list, and delete them easily.
 
 ## Dependencies.
 
@@ -24,88 +20,88 @@ bash coreutils
 
 Clone this repository:
 
-`git clone https://github.com/teegre/dalias.git`
+`$ git clone https://github.com/teegre/savcom.git`
 
 Then:
 
-`cd dalias`
+`$ cd savcom`
 
 And:
 
-`make install`
+`# make install`
 
 **Important**: Make sure you have a directory called `.local/bin` in your home  
 directory, and that it is included in your `$PATH`. Also make sure `$EDITOR`  
 environment variable is set to your favorite text editor.
 
-To create default aliases for **dalias**, run this command:
+To create default shortcuts for **savcom**, run this command:
 
-`dalias < aliases/default`
+`savcom < com/default`
 
 ## Uninstall.
 
 [Remove all aliases](#remove)
 
-`make uninstall`
+`# make uninstall`
 
 ## Usage
 
 ```
-dalias do <name> <command>
-dalias do <name> '<command> <arguments>'
-dalias ed <name>
-dalias cp <name> <newname>
-dalias mv <name> <newname>
-dalias rm <name>
-dalias dp <file>
-dalias ls [name|"glob"]
-dalias fix
-dalias help
-dalias version
-dalias < <file>
-cat <file> | dalias
+savcom do <name> <command>
+savcom do <name> '<command> <arguments>'
+savcom ed <name>
+savcom cp <name> <newname>
+savcom mv <name> <newname>
+savcom rm <name>
+savcom dp <file>
+savcom ls [name|"glob"]
+savcom fix
+savcom help
+savcom version
+savcom < <file>
+cat <file> | savcom
 ```
 
 ## Options.
 
-Invoked without argument, **dalias** reads from standard input.
+Invoked without argument, **savcom** reads from standard input.
 
 Available commands are:
 
-*  do: create/replace. (ddo)
-*  ed: edit. (ded)
-*  cp: copy. (dcp)
-*  mv: rename. (dmv)
-*  rm: delete. (drm)
-*  dp: dump existing aliases into a file. (ddp)
-*  ls: print/search dynamic alias list. (dls)
-*  fix: fix missing links.
+*  do: create/replace. (cdo)
+*  ed: edit. (ced)
+*  cp: copy. (ccp)
+*  mv: rename. (cmv)
+*  rm: delete. (crm)
+*  dp: dump existing shortcuts into a file. (cdp)
+*  ls: print/search shortcut list. (cls)
+*  fix: fix missing shortcut links.
 *  help: show help and exit.
 *  version: show program version and exit.
 
 ## Examples
 
-### To create a dynamic alias called *da* for **dalias**:
+### To create a shortcut called *sco* for **savcom**:
 
 ```
-> dalias do da dalias '"$@"'
-da: dynamic alias created.
+$ savcom do sco savcom '"$@"'
+sco: command shotcut created.
 ```
 
-The `'"$@"'` is mandatory here, since we want be able to pass options to **dalias**.  
+The `"$@"` is mandatory here, since we want be able to pass options to **savcom**.  
 Also notice the surrounding single quotes. They are needed to prevent the shell from interpreting "$@".
 
 It is good practice to quote commands, like so:
 
 ```
-> dalias do ma 'if [ -f ./manage.py ]; then ./manage.py "$@"; else echo "Not a Django project directory!"; fi'
-> ma: dynamic alias created.
+$ savcom do ma 'if [ -f ./manage.py ]; then ./manage.py "$@"; else echo "Not a Django project directory!"; fi'
+ma: command shortcut created.
 ```
 
 Otherwise it gets a little tricky :
 ```
-> dalias do ma if \[ -f ./manage.py \]\; then ./manage.py '"$@"'\; else echo '"Not a Django project directory!"'\; fi
-> ma: dynamic alias created.
+$ savcom do ma if \[ -f ./manage.py \]\; then ./manage.py '"$@"'\; else echo '"Not a Django project directory!"'\; fi
+ma: dynamic alias created.
 
 ```
 
@@ -114,17 +110,15 @@ This alias launches Django's command-line utility *manage.py* if it can be found
 
 ### Save aliases into a file:
 
-`dalias dp aliases.txt`
-
+`savcom dp shortcuts.txt`
 
 ### Remove all aliases: <a name="remove"></a>
 
 ```
-while read -r; do echo "rm $REPLY" | cut -d '=' -f 1 | dalias; done < <(dalias ls)
+while read -r; do echo "rm $REPLY" | cut -d '=' -f 1 | savcom; done < <(savcom ls)
 ```
 
-
 ### Restore aliases from a file:
-`dalias < aliases.txt`
+`savcom < shortcuts.txt`
 
-For more info, please read `man dalias`.
+For more info, please read `man savcom`.

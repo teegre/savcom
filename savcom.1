@@ -1,0 +1,134 @@
+.TH "SAVCOM" "1" "0.2.1" "May 2024" "General Commands"
+.SH "NAME"
+\fBsavcom\fR \- Save commands.
+.SH "SYNOPSIS"
+\fBsavcom\fR do <\fIname\fR> <\fIcommand\fR>
+.br
+\fBsavcom\fR do <\fIname\fR> \'<\fIcommand\fR> <\fIarguments\fR>\'
+.br
+\fBsavcom\fR ed <\fIname\fR>
+.br
+\fBsavcom\fR cp <\fIname\fR> <\fInew_name\fR>
+.br
+\fBsavcom\fR mv <\fIname\fR> <\fInew_name\fR>
+.br
+\fBsavcom\fR rm <\fIname\fR>
+.br
+\fBsavcom\fR dp <\fIfile\fR>
+.br
+\fBsavcom\fR ls [\fIname\fR|\fIglob\fR]
+.br
+\fBsavcom\fR fix
+.br
+\fBsavcom\fR help
+.br
+\fBsavcom\fR version
+.br
+\fBsavcom\fR < <\fIfile\fR>
+.br
+cat <\fIfile\fR> | \fBsavcom\fR
+.br
+.SH "DESCRIPTION"
+\fBsavcom\fR provides a quick way to create shortcuts for commands on the go\.
+.SH "OPTIONS"
+Invoked without argument, \fBsavcom\fR reads from standard input\.
+.P
+Available commands are:
+.P
+    - do: create or replace\.
+.br
+    - ed: edit(1)\.
+.br
+    - cp: copy\.
+.br
+    - mv: rename\.
+.br
+    - rm: delete\.
+.br
+    - dp: dump existing shortcuts into a file\.
+.br
+    - ls: print/search  shortcut list\.
+.br
+    - fix: fix missing links.
+.br
+    - help: show help and exit\.
+.br
+    - version: show program version and exit\.
+.P
+(1) Make sure \fB$EDITOR\fR environment variable is set.
+.SH "SAVE/RESTORE SHORTCUTS"
+.P
+You may want to save your shortcuts, for instance, to use them on another computer\.
+.br
+To do so:
+.IP "" 4
+.nf
+\fBsavcom\fR dp <\fIfile\fR>
+.fi
+.IP "" 0
+To restore your shortcuts, the syntax is as follow:
+.br
+.IP "" 4
+.nf
+\fBsavcom\fR < file
+.fi
+.IP "" 0
+.P
+or
+.IP "" 4
+.nf
+cat file | \fBsavcom\fR
+.fi
+.IP "" 0
+.P
+While processing, \fBsavcom\fR skips if an error is encountered and indicates on which line the error occured\.
+.br
+.SH "DIRECTORIES"
+Dynamic shortcuts are stored in \fB$HOME/\.config/savcom/shortcuts\fR directory\. And they are symlinked to
+.br
+\fB$HOME/\.local/bin\fR\.
+.SH "EXAMPLES"
+.P
+To create a shortcut called "sco" for \fBsavcom\fR:
+.IP "" 4
+.nf
+\fBsavcom\fR do sco savcom \'"$@"\'
+.fi
+.IP "" 0
+.br
+\fB\'"$@"\'\fR is mandatory since we want be able to pass options to \fBsavcom\fR\.
+.br
+Also notice the surrounding single quotes. They are needed to prevent shell expansion of \fB"$@"\fR\ variable.
+.br
+That said, it is good practice to quote the command and its arguments.
+.P
+Another example for \fBls\fR command:
+.IP "" 4
+.nf
+\fBsavcom\fR do ll \'ls \-ahl \-\-group\-directories\-first \-\-color=auto "$@"\'
+.fi
+.IP "" 0
+.P
+A more advanced last example:
+.IP "" 4
+.nf
+\fBsavcom\fR do dprm \'while read -r; do echo "rm $REPLY" | cut -d "=" -f 1; done < <(savcom ls) > rm_shortcuts\'
+.fi
+.IP "" 0
+.P
+This prints a \fIrm\fR command for every shortcut and saves them in a file called "rm_shortcuts"\.
+.fi
+.IP "" 0
+.P
+.SH "AUTHOR"
+Written by Stéphane MEYER (Teegre)
+.SH "REPORTING BUGS"
+<\fIhttps://github\.com/teegre/savcom/issues\fR>
+.SH "LICENSE"
+License GPL\-v3
+.P
+This is free software provided AS IS with NO WARRANTY\.
+.br
+Feel free to modify and redistribute\.
+.br
+For more info, see \fB/usr/share/licenses/savcom/LICENSE\fR

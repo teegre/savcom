@@ -1,4 +1,4 @@
-PROGNAME  ?= dalias
+PROGNAME  ?= savcom
 PREFIX    ?= /usr
 BINDIR    ?= $(PREFIX)/bin
 SHAREDIR  ?= $(PREFIX)/share
