@@ -21,10 +21,10 @@
 #
 # SAVCOM
 # C : 2021/04/19
-# M : 2024/05/13
+# M : 2024/05/31
 # D : Save commands.
 
-declare __version="0.2.1"
+declare __version="0.2.2"
 
 declare SAVDIR="$HOME/.config/savcom/com"
 declare BINDIR="$HOME/.local/bin"
@@ -93,7 +93,7 @@ do_com() {
 
   # does command shortcut already exist?
   local _com
-  _com="$(which "$name" 2> /dev/null)" && {
+  _com="$(command -v "$name")" && {
     if [[ $(readlink -f "$_com") =~ \.com$ ]]; then
       [[ $NOCONFIRM ]] && {
         _msg M "skipped: $name already exists."
@@ -164,7 +164,7 @@ op_com() {
     return 1
   }
 
-  which "$to" &> /dev/null && {
+  command -v "$to" &> /dev/null && {
     _msg E "${to} is an existing command/com."
     return 1
   }
@@ -282,7 +282,7 @@ fix_coms() {
       fi
     }
     # missing link
-    which "${BINDIR}/${name}" &> /dev/null || {
+    command -v "${BINDIR}/${name}" &> /dev/null || {
       ln -s "$f" "${BINDIR}/${name}" && {
         _msg M "${name}: missing [fixed]"
         ((count++))
