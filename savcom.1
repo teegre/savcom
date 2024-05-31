@@ -49,7 +49,7 @@ Available commands are:
 .br
     - ls: print/search  shortcut list\.
 .br
-    - fix: fix missing links.
+    - fix: fix missing/broken shortcuts.
 .br
     - help: show help and exit\.
 .br
@@ -84,7 +84,7 @@ cat file | \fBsavcom\fR
 While processing, \fBsavcom\fR skips if an error is encountered and indicates on which line the error occured\.
 .br
 .SH "DIRECTORIES"
-Dynamic shortcuts are stored in \fB$HOME/\.config/savcom/shortcuts\fR directory\. And they are symlinked to
+Dynamic shortcuts are stored in \fB$HOME/\.config/savcom/com\fR directory\. And they are symlinked to
 .br
 \fB$HOME/\.local/bin\fR\.
 .SH "EXAMPLES"
@@ -96,7 +96,7 @@ To create a shortcut called "sco" for \fBsavcom\fR:
 .fi
 .IP "" 0
 .br
-\fB\'"$@"\'\fR is mandatory since we want be able to pass options to \fBsavcom\fR\.
+\fB\'"$@"\'\fR is mandatory since we want to be able to pass options to \fBsavcom\fR\.
 .br
 Also notice the surrounding single quotes. They are needed to prevent shell expansion of \fB"$@"\fR\ variable.
 .br
