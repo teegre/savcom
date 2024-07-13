@@ -12,32 +12,6 @@ Save commands
 
 **Savcom** is a tool for managing command shortcuts efficiently, allowing users to create, modify, list, and delete them easily.
 
-## What's the use?
-
-One common use case for **savcom** would be in a development environment where users frequently need to execute complex commands or sequences of commands.
-
-Imagine you're working on a software project that involves multiple steps for building and deploying the application.
-Each step requires running several commands, and remembering or typing them out every time can be tedious and error-prone.
-This is where **savcom** comes in handy.
-
-### Creating Command Shortcuts:
-
-You can use the `do` command to create shortcuts for each step of your workflow. For example:
-
-```shell
-$ savcom do build 'npm install && npm run build'
-$ savcom do deploy 'git push origin master && ssh server "bash deploy.sh"'
-```
-
-### Simplifying Commands:
-
-Instead of typing out lengthy commands, you can now execute them using their shortcuts:
-
-```shell
-$ build
-$ deploy
-```
-
 ## Dependencies.
 
 bash coreutils
